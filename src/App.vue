@@ -3,7 +3,7 @@
     <!-- menu -->
     <div class="layout-menu">
       <div class="layout-menu__logo">
-        <img src="~@/assets/plane.svg" alt="plane">
+        Karen Zhong<img src="~@/assets/plane.svg" alt="plane">
       </div>
       <el-menu default-active="2"
         class="el-menu-vertical"
@@ -13,17 +13,9 @@
           <i class="el-icon-menu"></i>
           <span slot="title">首页</span>
         </el-menu-item>
-        <el-menu-item index="2">
+        <el-menu-item index="/admin/techo-list">
           <i class="el-icon-menu"></i>
-          <span slot="title">导航二</span>
-        </el-menu-item>
-        <el-menu-item index="3" disabled>
-          <i class="el-icon-document"></i>
-          <span slot="title">导航三</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <i class="el-icon-setting"></i>
-          <span slot="title">导航四</span>
+          <span slot="title">手账</span>
         </el-menu-item>
       </el-menu>
     </div>
@@ -73,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #FEC93D;
+    background: #E07A76;
     color: #fff;
     height: 50px;
     img {
@@ -96,7 +88,7 @@
     position: relative;
     box-shadow: rgba(11, 23, 35, 0.36) 0px 1px 4px;
     padding: 0px 30px 0px 0px;
-    background: #FEC93D;
+    background: #E07A76;
     display: flex;
     justify-content: space-between;
     flex: none;
