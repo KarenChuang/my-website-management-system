@@ -23,11 +23,11 @@
         <el-form-item label="图片">
           <el-upload
             class="avatar-uploader"
-            action="https://karenz.com/api/image/upload"
+            action="http://localhost:3001/api/techo/upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload">
-            <img v-if="form.image" :src="form.image" class="avatar">
+            <img v-if="imageBase64" :src="imageBase64" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -42,9 +42,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Emit } from 'vue-property-decorator'
 import axios from 'axios'
 import format from 'date-fns/format'
+import { Component, Vue } from 'vue-property-decorator'
+import { constants } from 'http2';
 
 @Component
 export default class extends Vue {
@@ -53,24 +54,26 @@ export default class extends Vue {
     image: null,
     date: null
   }
-  created () {
+  imageBase64 = null
+
+  handleAvatarSuccess (res: any) {
+    console.log('res', res)
+    this.form.image = res
   }
 
-  handleAvatarSuccess (res, file) {
-    this.form.image = URL.createObjectURL(file.raw)
+  async beforeAvatarUpload (file: File) {
+    const res: any = await this.getBase64(file)
+    this.imageBase64 = res.split(',')[1]
+    console.log(this.imageBase64)
   }
 
-  beforeAvatarUpload (file) {
-    const isJPG = file.type === 'image/jpeg'
-    const isLt10M = file.size / 1024 / 1024 < 10
-
-    if (!isJPG) {
-      this.$message.error('上传头像图片只能是 JPG 格式!')
-    }
-    if (!isLt2M) {
-      this.$message.error('上传头像图片大小不能超过 10MB!')
-    }
-    return isJPG && isLt10M
+  getBase64 (file: File) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = error => reject(error)
+    })
   }
   async onSubmit () {
     await axios.post('/api/techo', {
