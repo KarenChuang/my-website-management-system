@@ -2,10 +2,8 @@
   <div class="techo-create">
     <el-card class="techo-create__card">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item><a href="/">活动管理</a></el-breadcrumb-item>
-        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/admin/techo-list' }">手账列表</el-breadcrumb-item>
+        <el-breadcrumb-item>上传</el-breadcrumb-item>
       </el-breadcrumb>
     </el-card>
     <el-card class="techo-create__card">
@@ -14,22 +12,24 @@
           <el-input v-model="form.title"></el-input>
         </el-form-item>
         <el-form-item label="日期">
-          <el-date-picker
-            v-model="form.date"
-            type="date"
-            placeholder="选择日期">
+          <el-date-picker v-model="form.date" type="date" placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="图片">
-          <el-upload
-            class="avatar-uploader"
-            action="http://localhost:3001/api/techo/upload"
+          <el-upload class="avatar-uploader"
+            action='http://upload.qiniu.com/'
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
+            :on-progress="handleProgress"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :before-upload="beforeUpload"
+            :data='form'>
             <img v-if="imageBase64" :src="imageBase64" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <b>选择文件</b>：{{ fileName }}<br/>
+          <b>上传进度</b>：{{ loaded }} MB / {{ fileSize }} MB, {{ percent }}%<mbr/>
+          <b>上传结果</b>：{{ result }}<br/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -45,7 +45,7 @@
 import axios from 'axios'
 import format from 'date-fns/format'
 import { Component, Vue } from 'vue-property-decorator'
-import { constants } from 'http2';
+import { constants } from 'http2'
 
 @Component
 export default class extends Vue {
@@ -54,30 +54,34 @@ export default class extends Vue {
     image: null,
     date: null
   }
+  fileForm = {
+    key: ''
+  }
   imageBase64 = null
+  fileName:string = ''
+  fileSize:string = ''
+  loaded = ''
+  percent = ''
+  result = ''
 
-  handleAvatarSuccess (res: any) {
-    console.log('res', res)
-    this.form.image = res
+  beforeUpload (file:File) {
+    this.fileName = file.name
+    this.fileForm.key = file.name
+  }
+  handleProgress (event: any, file:File, fileList: Array<File>) {
+    this.loaded = (event.loaded / 1000000).toFixed(2)
+    this.fileSize = (event.total / 1000000).toFixed(2)
+    this.percent = (event.loaded / event.total * 100).toFixed(2)
+  }
+  handleSuccess () {
+    this.result = '上传成功'
+  }
+  handleError (error:any) {
+    this.result = error.toString()
   }
 
-  async beforeAvatarUpload (file: File) {
-    const res: any = await this.getBase64(file)
-    this.imageBase64 = res.split(',')[1]
-    console.log(this.imageBase64)
-  }
-
-  getBase64 (file: File) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = error => reject(error)
-    })
-  }
   async onSubmit () {
     await axios.post('/api/techo', {
-
     })
   }
 }
