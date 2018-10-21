@@ -13,7 +13,7 @@
         <el-table-column prop="_id" label="Id" min-width="180"></el-table-column>
         <el-table-column prop="image" label="手帐图片" min-width="180">
           <template slot-scope="{ row }">
-            <img :src="row.image" alt="img">
+            <img :src="`${row.image}?imageMogr2/thumbnail/!10p`" alt="img">
           </template>
         </el-table-column>
         <el-table-column prop="title" label="标题" min-width="180"></el-table-column>
@@ -64,17 +64,21 @@ export default class extends Vue {
 <style lang="scss">
 .techo-list {
   padding: 20px;
+
   &__card {
     margin-bottom: 10px;
   }
+
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .el-input {
       width: 250px;
     }
   }
+
   &__table {
     img {
       width: 60px;
