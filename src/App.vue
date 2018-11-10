@@ -9,13 +9,12 @@
         class="el-menu-vertical"
         background-color="#3D3B3B" text-color="#fff"
         active-text-color="#FEC93D" unique-opened router>
-        <!-- <el-menu-item index="/">
+        <el-menu-item index="/">
           <i class="el-icon-menu"></i>
           <span slot="title">首页</span>
-        </el-menu-item> -->
+        </el-menu-item>
         <el-menu-item index="/admin/techo-list">
           <i class="material-icons">book</i>
-          <!-- <i class="el-icon-menu"></i> -->
           <span slot="title">手账</span>
         </el-menu-item>
       </el-menu>

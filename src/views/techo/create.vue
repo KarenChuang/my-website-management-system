@@ -24,18 +24,19 @@
             :on-error="handleError"
             :before-upload="beforeUpload"
             :data='fileForm'>
-            <img v-if="submitForm.title" :src="`${DOMAIN}${submitForm.title}`" class="avatar">
+            <img v-if="submitForm.image && result === '上传成功'"
+              :src="`${submitForm.image}?imageMogr2/thumbnail/!30p`" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
-          <b>选择文件</b>：{{ fileName }}<br/>
+          <b>选择文件</b>：{{ fileName || '--' }}<br/>
           <b>上传进度</b>：
-          <span v-if="loaded">{{ loaded }} MB / {{ fileSize }} MB, {{ percent }}%</span>
+          <span>{{ loaded || '--' }} MB / {{ fileSize || '--' }} MB, {{ percent || '--' }}%</span>
           <br/>
-          <b>上传结果</b>：{{ result }}<br/>
+          <b>上传结果</b>：{{ result || '--' }}<br/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
-          <el-button>取消</el-button>
+          <el-button @click="$router.back()">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -59,11 +60,11 @@ export default class extends Vue {
     key: '',
     token: ''
   }
-  fileName:string = ''
-  fileSize:string = ''
-  loaded:string = ''
-  percent:string = ''
-  result:string = ''
+  fileName = ''
+  fileSize = ''
+  loaded = ''
+  percent = ''
+  result = ''
   DOMAIN:string = 'http://p4a0vsjqf.bkt.clouddn.com/'
 
   created () {
@@ -84,36 +85,36 @@ export default class extends Vue {
     this.fileForm.key = file.name
   }
 
-  handleProgress (event: any, file:File, fileList: Array<File>) {
-    this.loaded = (event.loaded / 1000000).toFixed(2)
-    this.fileSize = (event.total / 1000000).toFixed(2)
+  handleProgress (event: { loaded: number; total: number }, file:File, fileList: Array<File>) {
+    this.loaded = (event.loaded / 1024 / 1024).toFixed(2)
+    this.fileSize = (event.total / 1024 / 1024).toFixed(2)
     this.percent = (event.loaded / event.total * 100).toFixed(2)
   }
 
-  handleSuccess (res:any) {
-    this.submitForm.title = res.key.split('.')[0]
-    this.submitForm.image = this.DOMAIN + this.fileName
+  handleSuccess (res: { key: string }) {
+    this.submitForm.image = this.DOMAIN + res.key
     this.result = '上传成功'
   }
 
-  handleError (error:any) {
-    this.result = error.toString()
+  handleError (error: string) {
+    this.result = error
   }
 
   async onSubmit () {
     try {
-      await axios.post('/api/techo', {
-        form: this.submitForm
-      })
+      await axios.post('/api/techo', this.submitForm)
+      this.$router.push({path: '/admin/techo-list'})
+      this.$message.success('上传成功！')
     } catch (error) {
-      this.$message.error(error.error)
+      this.$message.error(error.error.message)
     }
   }
 }
 </script>
 
 <style lang="scss">
-$sidel-length: 178px;
+$sidel-width: 200px;
+$sidel-height: 150px;
 .techo-create {
   padding: 20px;
 
@@ -150,15 +151,15 @@ $sidel-length: 178px;
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: $sidel-length;
-    height: $sidel-length;
-    line-height: $sidel-length;
+    width: $sidel-width;
+    height: $sidel-height;
+    line-height: $sidel-height;
     text-align: center;
   }
 
   .avatar {
-    width: $sidel-length;
-    height: $sidel-length;
+    width: $sidel-width;
+    height: $sidel-height;
     display: block;
   }
 }
